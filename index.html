@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-family:system-ui,sans-serif;font-size:14px}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Minnesbilder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow training column; a tab strip on top, one index card as the focal object, controls below it. */
+:root{
+  --bg:#ECEEF5; --paper:#FFFFFF; --ink:#1A1E38; --muted:#5D6382; --line:#D3D7E6;
+  --accent:#3243C9; --accent-ink:#FFFFFF; --accent-soft:#E2E5FA;
+  --due:#B77800; --due-soft:#FBEFD5; --good:#1E7A4C; --good-soft:#DDF2E6; --bad:#B3372E; --bad-soft:#F8E0DD;
+  --shadow:0 1px 0 rgba(26,30,56,.06),0 10px 30px -12px rgba(26,30,56,.25);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"DM Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12142A; --paper:#1D2140; --ink:#E9EBF8; --muted:#A0A6C8; --line:#323867;
+  --accent:#8C98FF; --accent-ink:#12142A; --accent-soft:#2A3070;
+  --due:#F2B94A; --due-soft:#3B3017; --good:#6FD39C; --good-soft:#17382A; --bad:#F08A80; --bad-soft:#41201E;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 14px 34px -14px rgba(0,0,0,.7); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12142A; --paper:#1D2140; --ink:#E9EBF8; --muted:#A0A6C8; --line:#323867;
+  --accent:#8C98FF; --accent-ink:#12142A; --accent-soft:#2A3070;
+  --due:#F2B94A; --due-soft:#3B3017; --good:#6FD39C; --good-soft:#17382A; --bad:#F08A80; --bad-soft:#41201E;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 14px 34px -14px rgba(0,0,0,.7); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:620px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:800;font-size:30px;letter-spacing:-.02em;margin:0;line-height:1.1}
+h1 .key{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0;margin-left:6px;font-family:var(--f-mono)}
+h2{font-family:var(--f-display);font-weight:700;font-size:20px;margin:0;text-wrap:balance}
+.sync{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px}
+nav button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 14px/1.2 var(--f-body);padding:10px 4px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+nav button[aria-selected="true"]{background:var(--accent-soft);color:var(--ink)}
+nav .badge{font:500 11px/1 var(--f-mono);background:var(--due);color:var(--paper);padding:3px 6px;border-radius:99px}
+nav .badge[hidden]{display:none}
+
+.panel{display:flex;flex-direction:column;gap:16px}
+.lead{color:var(--muted);margin:0;max-width:60ch}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.label{font:500 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{appearance:none;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:500 14px/1 var(--f-mono);padding:9px 13px;border-radius:99px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500;box-shadow:0 0 0 3px var(--accent-soft)}
+.chip[aria-pressed="true"]::before{content:"✓ "}
+
+.btn{appearance:none;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:700 15px/1.2 var(--f-body);padding:12px 16px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.good{background:var(--good-soft);border-color:transparent;color:var(--good)}
+.btn.bad{background:var(--bad-soft);border-color:transparent;color:var(--bad)}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.block{width:100%}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* The index card */
+.card{background:var(--paper);border-radius:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer;min-height:230px;display:flex;flex-direction:column}
+.card::before{content:"";position:absolute;left:0;right:0;top:46px;border-top:2px solid var(--bad-soft)}
+.card .meta{display:flex;justify-content:space-between;padding:14px 18px 0;font:500 12px/1 var(--f-mono);color:var(--muted);letter-spacing:.04em;min-height:32px}
+.card .face{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:28px 14px 22px;text-align:center}
+.card .hint{font-size:13px;color:var(--muted)}
+.glyphs{display:flex;justify-content:center;gap:clamp(6px,2vw,14px);flex-wrap:wrap}
+.glyph{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px}
+.glyph .e{font-size:clamp(34px,9vw,48px);line-height:1.1}
+.glyph .w{font-size:12px;color:var(--muted)}
+.e.flip{display:inline-block;transform:scaleX(-1)}
+.e .scythe{width:1.1em;height:1.1em;display:block}
+.lrow .e .scythe{margin:0 auto}
+.digits{font:500 clamp(44px,13vw,68px)/1 var(--f-mono);letter-spacing:.12em;font-variant-numeric:tabular-nums;color:var(--accent)}
+.digits.small{font-size:24px;color:var(--muted)}
+
+.story{background:var(--accent-soft);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.story p{margin:0;font-size:17px;line-height:1.45}
+.story b{color:var(--accent);font-weight:700}
+.story .note{font-size:13px;color:var(--muted)}
+textarea{width:100%;min-height:68px;resize:vertical;font:16px/1.45 var(--f-body);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+
+.progress{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .25s}
+
+/* Leitner ladder */
+.ladder{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center;display:flex;flex-direction:column;gap:4px}
+.step .n{font:700 22px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.step .t{font:500 10px/1.2 var(--f-mono);color:var(--muted);letter-spacing:.04em}
+.step.done{background:var(--good-soft);border-color:transparent}
+.step.done .n{color:var(--good)}
+
+.empty{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:26px 18px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.empty .big{font:700 22px/1.2 var(--f-display)}
+
+.tally{display:flex;gap:14px;font:500 14px/1 var(--f-mono)}
+.tally .g{color:var(--good)} .tally .b{color:var(--bad)}
+
+.legend{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.lrow{display:grid;grid-template-columns:28px 40px 1fr;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+.lrow .d{font:500 20px/1 var(--f-mono);color:var(--accent)}
+.lrow .e{font-size:26px;text-align:center}
+.lrow input{min-width:0;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font:16px var(--f-body);padding:4px 2px}
+.done-box{background:var(--good-soft);color:var(--good);border-radius:12px;padding:14px 16px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:14px;z-index:20}
+@media (max-width:440px){.legend{grid-template-columns:1fr}.ladder{grid-template-columns:repeat(3,1fr)}nav button{font-size:13px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Minnesbilder</h1>
+    <span class="sync" id="sync">Sparas i webbläsaren</span>
+  </header>
+
+  <nav role="tablist" aria-label="Läge">
+    <button role="tab" data-tab="review" aria-selected="true">Repetera <span class="badge" id="dueBadge" hidden>0</span></button>
+    <button role="tab" data-tab="learn" aria-selected="false">Lär in</button>
+    <button role="tab" data-tab="free" aria-selected="false">Fri träning</button>
+    <button role="tab" data-tab="system" aria-selected="false">Mitt system</button>
+  </nav>
+
+  <section class="panel" id="p-review"></section>
+  <section class="panel" id="p-learn" hidden></section>
+  <section class="panel" id="p-free" hidden></section>
+  <section class="panel" id="p-system" hidden></section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const EMOJI=["⚽","🕯️","🦢","🐍","⛵","✋","🐿️","⚔️","☃️","🎈"];
+const DEFAULT_WORDS=["boll","stearinljus","svan","orm","segelbåt","hand","ekorre","lie","snögubbe","ballong"];
+// Leitner steps: wait after a correct answer in each box
+const STEPS=[{ms:36e5,t:"1 tim"},{ms:864e5,t:"1 dag"},{ms:3*864e5,t:"3 dagar"},{ms:7*864e5,t:"1 vecka"},{ms:21*864e5,t:"3 veckor"}];
+const RETRY_MS=10*6e4;
+
+let S={words:DEFAULT_WORDS.slice(),cards:[],dir:"e2d",learnLen:4,learnCount:5,freeLen:4};
+let db=null,docRef=null,sample=null,saving=false,pending=false,storyBusy=false;
+
+const $=s=>document.querySelector(s);
+const el=(tag,attrs={},...kids)=>{const n=document.createElement(tag);for(const k in attrs){if(k==="class")n.className=attrs[k];else if(k.startsWith("on"))n.addEventListener(k.slice(2),attrs[k]);else if(k.startsWith("aria-"))n.setAttribute(k,String(attrs[k]));else if(attrs[k]!==false&&attrs[k]!=null)n.setAttribute(k,attrs[k]===true?"":attrs[k]);}for(const c of kids.flat()){if(c==null||c===false)continue;n.append(c.nodeType?c:document.createTextNode(c));}return n;};
+const toast=m=>{const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2200);};
+const rnd=len=>{let s="";for(let i=0;i<len;i++)s+=Math.floor(Math.random()*10);return s;};
+const words=num=>[...num].map(d=>S.words[+d]||DEFAULT_WORDS[+d]);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fmtTime=ts=>{const d=new Date(ts),now=new Date();const same=d.toDateString()===now.toDateString();const tm=d.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit"});if(same)return"idag "+tm;const tmr=new Date(now);tmr.setDate(now.getDate()+1);if(d.toDateString()===tmr.toDateString())return"imorgon "+tm;return d.toLocaleDateString("sv-SE",{weekday:"short",day:"numeric",month:"short"})+" "+tm;};
+
+/* ---------- storage ---------- */
+function localLoad(){try{const r=localStorage.getItem("minnesbilder");if(r)Object.assign(S,JSON.parse(r));}catch(e){}}
+function localSave(){try{localStorage.setItem("minnesbilder",JSON.stringify(S));}catch(e){}}
+async function save(){
+  localSave();
+  if(!docRef)return;
+  if(saving){pending=true;return;}
+  saving=true;
+  try{await docRef.set(JSON.parse(JSON.stringify(S)));$("#sync").textContent="Sparat i ditt konto";}
+  catch(e){$("#sync").textContent="Sparat lokalt (kontot svarar inte)";}
+  saving=false;
+  if(pending){pending=false;save();}
+}
+localLoad();
+
+/* ---------- shared pieces ---------- */
+const SCYTHE='<svg viewBox="0 0 48 48" class="scythe" aria-hidden="true"><path d="M5 10 C17 2 33 2 45 8 C35 7 21 9 9 15 Z" fill="#A7B1C2" stroke="#5E6878" stroke-width="1.5" stroke-linejoin="round"/><line x1="42" y1="8" x2="17" y2="45" stroke="#8A5A2B" stroke-width="4.5" stroke-linecap="round"/><line x1="29" y1="23" x2="36" y2="28" stroke="#8A5A2B" stroke-width="4" stroke-linecap="round"/></svg>';
+function glyph(d){const s=el("span",{class:"e"+(d===6?" flip":""),"aria-hidden":"true"});if(d===7)s.innerHTML=SCYTHE;else s.textContent=EMOJI[d];return s;}
+function glyphRow(num,showWords=true){return el("div",{class:"glyphs"},[...num].map(d=>el("div",{class:"glyph"},glyph(+d),showWords?el("span",{class:"w"},S.words[+d]):null)));}
+function storyBlock(text){
+  const p=el("p");
+  // highlight the object words so the order is easy to check
+  const ws=S.words.filter(Boolean).map(w=>w.toLowerCase()).sort((a,b)=>b.length-a.length);
+  const re=ws.length?new RegExp("("+ws.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")[a-zåäö]*","gi"):null;
+  if(!re){p.textContent=text;return p;}
+  let last=0;text.replace(re,(m,_g,i)=>{p.append(text.slice(last,i));p.append(el("b",{},m));last=i+m.length;return m;});p.append(text.slice(last));
+  return p;
+}
+async function askStory(num,box,onUse){
+  if(!sample||storyBusy)return;
+  storyBusy=true;
+  box.replaceChildren(el("p",{class:"note"},"Tänker ut en bild…"));
+  const list=words(num);
+  const prompt=`Du hjälper någon att memorera siffror med en bildmetod. Varje siffra är ett föremål. Skriv EN mycket kort mening på svenska (högst ${Math.max(8,list.length*3)} ord) där dessa föremål förekommer i EXAKT denna ordning: ${list.map((w,i)=>(i+1)+". "+w).join(", ")}.
+
+Krav:
+- Nämn varje föremål med exakt det ord som står ovan (böjning som "bollen" är ok).
+- Samma föremål flera gånger ska nämnas flera gånger (t.ex. "två ballonger" räknas inte, skriv ut båda).
+- Föremålen ska göra något konkret med varandra, gärna överdrivet eller roligt, så att man ser det framför sig.
+- Inga andra föremål, personer eller platser som kan förväxlas med listan.
+- Svara med bara meningen, inga citattecken eller förklaringar.`;
+  try{
+    const {text}=await sample(prompt,{modelTier:"quick",cache:false,onText:({text})=>{box.replaceChildren(el("p",{},text));}});
+    const clean=text.trim().replace(/^["„”']+|["„”']+$/g,"");
+    box.replaceChildren(storyBlock(clean),el("div",{class:"row"},
+      el("button",{class:"btn ghost",onclick:()=>askStory(num,box,onUse)},"Ny berättelse"),
+      onUse?el("button",{class:"btn",onclick:()=>onUse(clean)},"Använd den här"):null));
+  }catch(e){
+    const msg={not_granted:"Claude är inte tillåten för den här sidan. Skriv en egen berättelse i stället.",rate_limited:"För många förfrågningar just nu. Vänta en stund och försök igen.",sampling_disabled:"Claude är inte tillgänglig för ditt konto här.",session_expired:"Logga in igen för att använda Claude."}[e&&e.code]||"Kunde inte skapa en berättelse. Försök igen.";
+    box.replaceChildren(el("p",{class:"note"},msg),e&&e.code!=="not_granted"?el("div",{class:"row"},el("button",{class:"btn ghost",onclick:()=>askStory(num,box,onUse)},"Försök igen")):null);
+  }
+  storyBusy=false;
+}
+function storyButton(num,onUse){
+  if(!sample)return null;
+  const box=el("div",{class:"story"});box.hidden=true;
+  const b=el("button",{class:"btn block",onclick:(ev)=>{ev.stopPropagation();box.hidden=false;b.hidden=true;askStory(num,box,onUse);}},"✨ Föreslå berättelse");
+  return el("div",{class:"panel",style:"gap:10px"},b,box);
+}
+
+/* ---------- tabs ---------- */
+let tab="review";
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));["review","learn","free","system"].forEach(t=>$("#p-"+t).hidden=t!==tab);render();}));
+function render(){updateBadge();({review:renderReview,learn:renderLearn,free:renderFree,system:renderSystem})[tab]();}
+function dueCards(){const now=Date.now();return S.cards.filter(c=>c.box<STEPS.length&&c.due<=now).sort((a,b)=>a.due-b.due);}
+function updateBadge(){const n=dueCards().length,b=$("#dueBadge");b.textContent=n;b.hidden=!n;}
+setInterval(()=>{updateBadge();if(tab==="review"&&!reviewState.card)renderReview();},60000);
+
+/* ---------- Repetera ---------- */
+let reviewState={card:null,flipped:false,session:{g:0,b:0}};
+function dirChips(onChange){
+  return el("div",{class:"row"},el("span",{class:"label"},"Visa först"),el("div",{class:"chips"},
+    [["e2d","Bilder"],["d2e","Siffror"]].map(([v,t])=>el("button",{class:"chip","aria-pressed":S.dir===v,onclick:()=>{S.dir=v;save();onChange();}},t))));
+}
+function ladder(){
+  const counts=Array(STEPS.length+1).fill(0);S.cards.forEach(c=>counts[Math.min(c.box,STEPS.length)]++);
+  return el("div",{class:"panel",style:"gap:8px"},el("span",{class:"label"},"Dina kort per steg"),
+    el("div",{class:"ladder"},STEPS.map((s,i)=>el("div",{class:"step"},el("span",{class:"n"},counts[i]),el("span",{class:"t"},"steg "+(i+1)+" · "+s.t))),
+      el("div",{class:"step done"},el("span",{class:"n"},counts[STEPS.length]),el("span",{class:"t"},"sitter"))));
+}
+function renderReview(){
+  const p=$("#p-review");p.replaceChildren();
+  const due=dueCards();
+  if(!reviewState.card||!S.cards.includes(reviewState.card)||reviewState.card.due>Date.now()&&!reviewState.flipped){reviewState.card=due[0]||null;reviewState.flipped=false;}
+  const c=reviewState.card;
+  if(!c){
+    const next=S.cards.filter(x=>x.box<STEPS.length).sort((a,b)=>a.due-b.due)[0];
+    p.append(el("div",{class:"empty"},
+      el("span",{class:"big"},S.cards.length?"Inga kort att repetera just nu":"Inga kort än"),
+      el("span",{class:"lead"},S.cards.length?(next?"Nästa kort blir klart "+fmtTime(next.due)+".":"Alla dina kort sitter. Lär in en ny omgång."):"Börja med en omgång under Lär in. Korten dyker upp här när det är dags att repetera."),
+      el("button",{class:"btn primary",onclick:()=>document.querySelector('[data-tab="learn"]').click()},"Lär in en omgång")));
+    if(reviewState.session.g+reviewState.session.b)p.append(el("div",{class:"tally"},el("span",{class:"g"},"✓ "+reviewState.session.g),el("span",{class:"b"},"✗ "+reviewState.session.b)));
+    if(S.cards.length)p.append(ladder());
+    return;
+  }
+  p.append(el("div",{class:"row",style:"justify-content:space-between"},el("h2",{},due.length+" kort att repetera"),
+    el("div",{class:"tally"},el("span",{class:"g"},"✓ "+reviewState.session.g),el("span",{class:"b"},"✗ "+reviewState.session.b))));
+  p.append(dirChips(renderReview));
+  const front=S.dir==="e2d";
+  const flipped=reviewState.flipped;
+  const card=el("div",{class:"card",role:"button",tabindex:"0","aria-label":flipped?"Kortets baksida":"Vänd kortet",onclick:()=>{if(!reviewState.flipped){reviewState.flipped=true;renderReview();}},onkeydown:e=>{if((e.key==="Enter"||e.key===" ")&&!reviewState.flipped){e.preventDefault();reviewState.flipped=true;renderReview();}}},
+    el("div",{class:"meta"},el("span",{},"steg "+(c.box+1)+" av "+STEPS.length),el("span",{},c.num.length+" siffror")),
+    el("div",{class:"face"},
+      !flipped?(front?[glyphRow(c.num,false),el("span",{class:"hint"},"Vilka siffror? Säg dem tyst, vänd sedan.")]:[el("div",{class:"digits"},c.num),el("span",{class:"hint"},"Vilka bilder och vilken berättelse? Vänd sedan.")])
+             :[glyphRow(c.num,true),el("div",{class:"digits"+(front?"":" small")},c.num)]));
+  p.append(card);
+  if(flipped){
+    if(c.story)p.append(el("div",{class:"story"},el("span",{class:"label"},"Din berättelse"),storyBlock(c.story)));
+    p.append(el("div",{class:"pair"},
+      el("button",{class:"btn bad",onclick:()=>grade(false)},"✗ Fel"),
+      el("button",{class:"btn good",onclick:()=>grade(true)},"✓ Rätt")));
+    p.append(el("span",{class:"hint lead",style:"font-size:13px"},"Rätt flyttar kortet ett steg upp ("+(STEPS[c.box+1]?"nästa gång om "+STEPS[c.box+1].t:"sedan räknas det som inlärt")+"). Fel skickar det tillbaka till steg 1 och visar det igen om 10 minuter."));
+    if(!c.story){const sb=storyButton(c.num,t=>{c.story=t;save();renderReview();});if(sb)p.append(sb);}
+  }else{
+    p.append(el("button",{class:"btn primary block",onclick:()=>{reviewState.flipped=true;renderReview();}},"Vänd kortet"));
+  }
+  p.append(ladder());
+}
+function grade(ok){
+  const c=reviewState.card;if(!c)return;
+  c.hist=(c.hist||"")+(ok?"r":"f");c.last=Date.now();
+  if(ok){c.box+=1;c.due=c.box<STEPS.length?Date.now()+STEPS[c.box].ms:Infinity;reviewState.session.g++;}
+  else{c.box=0;c.due=Date.now()+RETRY_MS;reviewState.session.b++;}
+  if(c.due===Infinity)c.due=9e15;
+  reviewState.card=null;reviewState.flipped=false;save();render();
+}
+
+/* ---------- Lär in ---------- */
+let learn=null; // {cards:[{num,story}], i}
+function renderLearn(){
+  const p=$("#p-learn");p.replaceChildren();
+  if(!learn){
+    p.append(el("h2",{},"Ny omgång"),
+      el("p",{class:"lead"},"Du får några slumpade nummer. Bygg en bild eller berättelse för varje. Korten sparas och kommer tillbaka under Repetera om en timme, sedan med allt längre mellanrum."),
+      el("div",{class:"row"},el("span",{class:"label"},"Siffror per kort"),el("div",{class:"chips"},[3,4,5,6].map(n=>el("button",{class:"chip","aria-pressed":S.learnLen===n,onclick:()=>{S.learnLen=n;save();renderLearn();}},n)))),
+      el("div",{class:"row"},el("span",{class:"label"},"Antal kort"),el("div",{class:"chips"},[3,5,8].map(n=>el("button",{class:"chip","aria-pressed":S.learnCount===n,onclick:()=>{S.learnCount=n;save();renderLearn();}},n)))),
+      el("button",{class:"btn primary block",onclick:()=>{learn={cards:Array.from({length:S.learnCount},()=>({num:rnd(S.learnLen),story:""})),i:0};renderLearn();}},"Skapa omgång med "+S.learnCount+" kort"));
+    if(S.cards.length)p.append(el("p",{class:"lead",style:"font-size:14px"},"Du har "+S.cards.length+" kort sparade."));
+    return;
+  }
+  const k=learn.cards[learn.i],n=learn.cards.length;
+  p.append(el("div",{class:"row",style:"justify-content:space-between"},el("h2",{},"Kort "+(learn.i+1)+" av "+n),
+    el("button",{class:"btn ghost",onclick:()=>{learn.cards[learn.i].num=rnd(S.learnLen);learn.cards[learn.i].story="";renderLearn();}},"Byt nummer")));
+  p.append(el("div",{class:"progress"},el("i",{style:"width:"+((learn.i+1)/n*100)+"%"})));
+  p.append(el("div",{class:"card",style:"cursor:default"},el("div",{class:"meta"},el("span",{},"lär in"),el("span",{},k.num.length+" siffror")),
+    el("div",{class:"face"},el("div",{class:"digits"},k.num),glyphRow(k.num,true))));
+  const ta=el("textarea",{id:"learnStory",placeholder:"Din egen berättelse, t.ex. "+words(k.num).slice(0,3).join(", ")+" …"});
+  ta.value=k.story;ta.addEventListener("input",()=>{k.story=ta.value;});
+  p.append(el("div",{class:"panel",style:"gap:6px"},el("label",{class:"label",for:"learnStory"},"Din berättelse (valfri)"),ta));
+  const sb=storyButton(k.num,t=>{k.story=t;ta.value=t;toast("Berättelsen är sparad på kortet");});
+  if(sb)p.append(sb);
+  const last=learn.i===n-1;
+  p.append(el("div",{class:"pair"},
+    el("button",{class:"btn",disabled:learn.i===0,onclick:()=>{learn.i--;renderLearn();}},"← Föregående"),
+    last?el("button",{class:"btn primary",onclick:finishLearn},"Spara omgången"):el("button",{class:"btn primary",onclick:()=>{learn.i++;renderLearn();}},"Nästa →")));
+  p.append(el("button",{class:"btn ghost",onclick:()=>{learn=null;renderLearn();}},"Avbryt omgången"));
+}
+function finishLearn(){
+  const now=Date.now();
+  learn.cards.forEach(k=>S.cards.push({id:uid(),num:k.num,story:k.story.trim(),box:0,due:now+STEPS[0].ms,created:now,hist:""}));
+  // keep the store bounded: drop the oldest learned cards beyond 300
+  if(S.cards.length>300){const keep=S.cards.filter(c=>c.box<STEPS.length);S.cards=keep.length>300?keep.slice(-300):keep.concat(S.cards.filter(c=>c.box>=STEPS.length).slice(-(300-keep.length)));}
+  const n=learn.cards.length;learn=null;save();render();
+  const p=$("#p-learn");p.prepend(el("div",{class:"done-box"},n+" kort sparade. Första repetitionen "+fmtTime(now+STEPS[0].ms)+"."));
+}
+
+/* ---------- Fri träning ---------- */
+let free={num:null,flipped:false,g:0,b:0};
+function renderFree(){
+  const p=$("#p-free");p.replaceChildren();
+  if(!free.num||free.num.length!==S.freeLen){free.num=rnd(S.freeLen);free.flipped=false;}
+  p.append(el("div",{class:"row",style:"justify-content:space-between"},el("h2",{},"Fri träning"),
+    el("div",{class:"tally"},el("span",{class:"g"},"✓ "+free.g),el("span",{class:"b"},"✗ "+free.b),
+      el("button",{class:"btn ghost",style:"padding:4px 8px;font-size:12px",onclick:()=>{free.g=0;free.b=0;renderFree();}},"Nollställ"))));
+  p.append(el("p",{class:"lead"},"Nya slumpade nummer varje gång, utan schema. Bra för att få systemet att sitta."));
+  p.append(el("div",{class:"row"},el("span",{class:"label"},"Siffror"),el("div",{class:"chips"},[3,4,5,6].map(n=>el("button",{class:"chip","aria-pressed":S.freeLen===n,onclick:()=>{S.freeLen=n;free.num=null;save();renderFree();}},n)))));
+  p.append(dirChips(()=>{free.flipped=false;renderFree();}));
+  const front=S.dir==="e2d",f=free.flipped;
+  const flip=()=>{free.flipped=!free.flipped;renderFree();};
+  p.append(el("div",{class:"card",role:"button",tabindex:"0","aria-label":"Vänd kortet",onclick:flip,onkeydown:e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip();}}},
+    el("div",{class:"meta"},el("span",{},"fri träning"),el("span",{},f?"baksida":"framsida")),
+    el("div",{class:"face"},!f?(front?[glyphRow(free.num,false),el("span",{class:"hint"},"Klicka för att se siffrorna")]:[el("div",{class:"digits"},free.num),el("span",{class:"hint"},"Klicka för att se bilderna")])
+      :[glyphRow(free.num,true),el("div",{class:"digits"+(front?"":" small")},free.num)])));
+  const next=ok=>{ok?free.g++:free.b++;free.num=rnd(S.freeLen);free.flipped=false;renderFree();};
+  if(f)p.append(el("div",{class:"pair"},el("button",{class:"btn bad",onclick:()=>next(false)},"✗ Fel"),el("button",{class:"btn good",onclick:()=>next(true)},"✓ Rätt")));
+  else p.append(el("div",{class:"pair"},el("button",{class:"btn",onclick:()=>{free.num=rnd(S.freeLen);renderFree();}},"Hoppa över"),el("button",{class:"btn primary",onclick:flip},"Vänd kortet")));
+  const num=free.num;
+  const sb=storyButton(num,t=>{S.cards.push({id:uid(),num,story:t,box:0,due:Date.now()+STEPS[0].ms,created:Date.now(),hist:""});save();updateBadge();toast("Kortet är sparat för repetition");});
+  if(sb)p.append(sb);
+}
+
+/* ---------- Mitt system ---------- */
+function renderSystem(){
+  const p=$("#p-system");p.replaceChildren();
+  p.append(el("h2",{},"Mitt siffersystem"),
+    el("p",{class:"lead"},"Ordet för varje bild används när Claude skriver berättelser. Ändra ett ord om du tänker på bilden på ett annat sätt, till exempel om 🕯️ är ett ljus för dig."));
+  p.append(el("div",{class:"legend"},EMOJI.map((e,d)=>{
+    const inp=el("input",{id:"w"+d,value:S.words[d],"aria-label":"Ord för siffran "+d});
+    inp.addEventListener("change",()=>{S.words[d]=inp.value.trim().toLowerCase()||DEFAULT_WORDS[d];inp.value=S.words[d];save();toast("Sparat");});
+    return el("div",{class:"lrow"},el("span",{class:"d"},d),glyph(d),inp);})));
+  p.append(el("button",{class:"btn ghost",onclick:()=>{S.words=DEFAULT_WORDS.slice();save();renderSystem();toast("Orden är återställda");}},"Återställ orden"));
+  p.append(el("div",{class:"story"},el("span",{class:"label"},"Så tränar du"),
+    el("p",{style:"font-size:15px"},"1. Lär in en omgång med 3 eller 4 siffror per kort och gör en bild för varje."),
+    el("p",{style:"font-size:15px"},"2. Kom tillbaka när Repetera visar en siffra i fliken. Vänd, var ärlig med rätt och fel."),
+    el("p",{style:"font-size:15px"},"3. Gå upp till 5 och 6 siffror när de flesta korten klarar steg 3."),
+    el("p",{style:"font-size:15px"},"4. Växla mellan Bilder och Siffror först, så tränar du både att avkoda och att koda.")));
+  if(S.cards.length)p.append(el("button",{class:"btn bad",onclick:function(){if(this.dataset.sure){S.cards=[];save();render();toast("Alla kort är borttagna");}else{this.dataset.sure="1";this.textContent="Klicka igen för att ta bort alla "+S.cards.length+" kort";}}},"Ta bort alla sparade kort"));
+}
+
+render();
+
+/* ---------- capabilities light up later ---------- */
+(async()=>{
+  if(!window.claude||!claude.use)return;
+  claude.use("sample").then(s=>{if(s){sample=s;render();}}).catch(()=>{});
+  try{
+    const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!d||!u)return;
+    const id=await u.id();if(!id)return;
+    db=d;const ref=db.doc("data/users/"+id+"/progress");
+    const snap=await ref.get();
+    if(snap.exists){const data=snap.data();Object.assign(S,JSON.parse(JSON.stringify(data)));localSave();}
+    docRef=ref;$("#sync").textContent="Sparas i ditt konto";
+    if(!snap.exists&&S.cards.length)save();
+    render();
+  }catch(e){}
+})();
+})();
+</script>
+
+</body>
+</html>
